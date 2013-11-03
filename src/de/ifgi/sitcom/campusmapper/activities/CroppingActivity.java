@@ -138,30 +138,6 @@ public class CroppingActivity extends SherlockFragmentActivity {
 		
 		return true;
 	}
-	
-//	/*
-//	 * callback for openCV library
-//	 * called when attempt to load is finished
-//	 */
-//    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-//        @Override
-//        public void onManagerConnected(int status) {
-//            switch (status) {
-//                case LoaderCallbackInterface.SUCCESS:
-//                {
-//                    Log.i("debug", "OpenCV loaded successfully");                    
-//                    mView.setAction(ImageView.ACTION_LOAD_IMAGE);
-//                                        
-//                } break;
-//                default:
-//                {
-//                    Log.i("debug", "OpenCV did not load");
-//                    super.onManagerConnected(status);
-//                } break;
-//            }
-//        }
-//    };
-
     
 	@Override
 	  public boolean onOptionsItemSelected(MenuItem item) {
@@ -177,13 +153,17 @@ public class CroppingActivity extends SherlockFragmentActivity {
 		case R.id.action_ok_transformation:
 			
 			//do the image transformation
-			imageTransformation();
-
-			// update behaviour of handler
-			mView.getUIActionHandler().handleMenuAction(item);
+			if (imageTransformation()){
+				// update behaviour of handler
+				mView.getUIActionHandler().handleMenuAction(item);
+				
+				// show undo button in action bar, i.e load other menu xml
+				supportInvalidateOptionsMenu();				
+			} else {
+				mView.setAction(ImageView.ACTION_LOAD_IMAGE);
+			}
 			
-			// show undo button in action bar, i.e load other menu xml
-			supportInvalidateOptionsMenu();
+
 			return true;
 			
 		case R.id.action_ok_result:
@@ -240,25 +220,7 @@ public class CroppingActivity extends SherlockFragmentActivity {
 	/*
 	 * performs the image transformation
 	 */
-	private void imageTransformation (){
-//		Mat src = mView.getImage();
-//		CroppingHandler croppingTouchHandler = (CroppingHandler) mView.getUIActionHandler();
-//		
-//		MatOfPoint2f cornersMask = new MatOfPoint2f(new Point(croppingTouchHandler.getCircleAX(), croppingTouchHandler.getCircleAY()), 
-//				new Point(croppingTouchHandler.getCircleBX(), croppingTouchHandler.getCircleBY()), 
-//				new Point(croppingTouchHandler.getCircleDX(), croppingTouchHandler.getCircleDY()), 
-//				new Point(croppingTouchHandler.getCircleCX(), croppingTouchHandler.getCircleCY()));
-//		MatOfPoint2f cornersImage = new MatOfPoint2f(new Point(0, 0), new Point(src.width(), 0), new Point(src.width(), src.height()), new Point(0, src.height()));
-//		Imgproc.warpPerspective(src, src, Imgproc.getPerspectiveTransform(cornersMask, cornersImage), src.size());
-		
-		// TODO fix
-//		MatOfPoint2f cornersImage = new MatOfPoint2f(new Point(0, 0), 
-//				new Point(croppingTouchHandler.getCircleBX(), 0), 
-//				new Point(croppingTouchHandler.getCircleBX(), croppingTouchHandler.getCircleDY()), 
-//				new Point(0, croppingTouchHandler.getCircleDY()));
-//		Imgproc.warpPerspective(src, src, Imgproc.getPerspectiveTransform(cornersMask, cornersImage), 
-//				new Size(croppingTouchHandler.getCircleBX(), croppingTouchHandler.getCircleDY()));
-		
+	private boolean imageTransformation (){
 		/*
 		 * 
 		 * A---B 
@@ -266,7 +228,6 @@ public class CroppingActivity extends SherlockFragmentActivity {
 		 */
 		
 		Bitmap bitmap = mView.getBitmap();
-//		Mat image = mView.getImage();
 		CroppingHandler croppingTouchHandler = (CroppingHandler) mView.getUIActionHandler();
 	    Matrix matrix = new Matrix();
 
@@ -278,69 +239,50 @@ public class CroppingActivity extends SherlockFragmentActivity {
 	    int newHeight = maxY - minY;
 	    
 
-	    float[] src = new float[] {
-	    		croppingTouchHandler.getCircleAX(),
-	    		croppingTouchHandler.getCircleAY(),
-	    		croppingTouchHandler.getCircleBX(),
-	    		croppingTouchHandler.getCircleBY(),
-	    		croppingTouchHandler.getCircleDX(),
-	    		croppingTouchHandler.getCircleDY(),
-	    		croppingTouchHandler.getCircleCX(),
-	    		croppingTouchHandler.getCircleCY()
-	    };
+		float[] src = new float[] { croppingTouchHandler.getCircleAX(),
+				croppingTouchHandler.getCircleAY(),
+				croppingTouchHandler.getCircleBX(),
+				croppingTouchHandler.getCircleBY(),
+				croppingTouchHandler.getCircleDX(),
+				croppingTouchHandler.getCircleDY(),
+				croppingTouchHandler.getCircleCX(),
+				croppingTouchHandler.getCircleCY() };
 
+		float[] dst = new float[] { minX, minY, maxX, minY, maxX, maxY, minX,
+				maxY };
 
-	    
-	    int ab = (int)croppingTouchHandler.getCircleBX() - (int)croppingTouchHandler.getCircleAX();
-	    int bd = (int)croppingTouchHandler.getCircleDY() - (int)croppingTouchHandler.getCircleBY();
-	    int dc = (int)croppingTouchHandler.getCircleDX() - (int)croppingTouchHandler.getCircleCX();
-	    int ca = (int)croppingTouchHandler.getCircleCY() - (int)croppingTouchHandler.getCircleAY();
+		// transform
+		matrix.setPolyToPoly(src, 0, dst, 0, 4);
 
-	    float[] dst = new float[] {
-		minX,
-		minY,
-        maxX,
-        minY,
-        maxX,
-        maxY,
-        minX,
-        maxY
-};
-	    
-//float[] dst = new float[] {
-//		0,
-//		0,
-//        newWidth,
-//        0,
-//        newWidth,
-//        newHeight,
-//        0,
-//        newHeight
-//};
-//	    float[] dst = new float[] {
-//	    		0,
-//	    		0,
-//	            ab,
-//	            0,
-//	            dc,
-//	            bd,
-//	            0,
-//	            ca
-//	    };
+		try{
+		bitmap = Bitmap.createBitmap(bitmap, minX, minY, newWidth, newHeight,
+				matrix, true);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return false;
+		}
 
-	    // transform
-	    matrix.setPolyToPoly(src, 0, dst, 0, 4);
-	    bitmap = Bitmap.createBitmap(bitmap, minX, minY, newWidth, newHeight, matrix, true);
-	    
-	    //crop
-	    int devLeft = Math.abs((int)croppingTouchHandler.getCircleAX() - (int)croppingTouchHandler.getCircleCX());
-	    int devTop = Math.abs((int)croppingTouchHandler.getCircleAY() - (int)croppingTouchHandler.getCircleBY());
-	    int devRight = Math.abs((int)croppingTouchHandler.getCircleBX() - (int)croppingTouchHandler.getCircleDX());
-	    int devBottom = Math.abs((int)croppingTouchHandler.getCircleCY() - (int)croppingTouchHandler.getCircleDY());
-	    bitmap = Bitmap.createBitmap(bitmap, devLeft, devTop, bitmap.getWidth() - devLeft - devRight, bitmap.getHeight() - devTop - devBottom);
-	    mView.setBitmap(bitmap);
+		// crop
+		int devLeft = Math.abs((int) croppingTouchHandler.getCircleAX()
+				- (int) croppingTouchHandler.getCircleCX());
+		int devTop = Math.abs((int) croppingTouchHandler.getCircleAY()
+				- (int) croppingTouchHandler.getCircleBY());
+		int devRight = Math.abs((int) croppingTouchHandler.getCircleBX()
+				- (int) croppingTouchHandler.getCircleDX());
+		int devBottom = Math.abs((int) croppingTouchHandler.getCircleCY()
+				- (int) croppingTouchHandler.getCircleDY());
+		
+		try{
+			bitmap = Bitmap.createBitmap(bitmap, devLeft, devTop, bitmap.getWidth()
+					- devLeft - devRight, bitmap.getHeight() - devTop - devBottom);
+			mView.setBitmap(bitmap);			
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 
-//		Utils.bitmapToMat(bitmap, image);		
 	}
 	
 	/*

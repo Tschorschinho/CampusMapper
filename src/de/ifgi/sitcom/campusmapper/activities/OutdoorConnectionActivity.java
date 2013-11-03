@@ -17,6 +17,7 @@ import de.ifgi.sitcom.campusmapper.dialogs.SettingsDialog;
 import de.ifgi.sitcom.campusmapper.io.TripleStoreQueries;
 import de.ifgi.sitcom.campusmapper.outdoordata.Building;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -53,11 +54,11 @@ public class OutdoorConnectionActivity extends SherlockFragmentActivity {
 		mMapView.setMultiTouchControls(true);
 		mMapView.getController().setZoom(14);
 
-		float latMünster = 51.966667f; // in DecimalDegrees
-		float lngMünster = 7.633333f; // in DecimalDegrees
-		GeoPoint gpMünster = new GeoPoint((int) (latMünster * 1E6),
-				(int) (lngMünster * 1E6));
-		mMapView.getController().setCenter(gpMünster);
+		float latMuenster = 51.966667f; // in DecimalDegrees
+		float lngMuenster = 7.633333f; // in DecimalDegrees
+		GeoPoint gpMuenster = new GeoPoint((int) (latMuenster * 1E6),
+				(int) (lngMuenster * 1E6));
+		mMapView.getController().setCenter(gpMuenster);
 
 		// add toch listener
 		mGestureDetector = new GestureDetector(this, new SingleTapListener());
@@ -79,8 +80,13 @@ public class OutdoorConnectionActivity extends SherlockFragmentActivity {
 		 * This way we can have multiple async tasks at the same time.
 		 */
 		mLoadBuildingShapeFromLODUM = new LoadBuildingShapeFromLODUM();
-		mLoadBuildingShapeFromLODUM.executeOnExecutor(
-				AsyncTask.THREAD_POOL_EXECUTOR, "");
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			mLoadBuildingShapeFromLODUM
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		} else {
+			mLoadBuildingShapeFromLODUM.execute();
+		}
 
 	}
 

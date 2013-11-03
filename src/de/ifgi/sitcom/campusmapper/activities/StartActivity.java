@@ -33,6 +33,11 @@ public class StartActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 		
 		mLocalProjectButton = (Button) findViewById(R.id.button_local_project);
 		if (hasLocalFloorPlan()) mLocalProjectButton.setVisibility(View.VISIBLE);

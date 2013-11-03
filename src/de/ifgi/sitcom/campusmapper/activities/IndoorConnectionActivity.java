@@ -16,6 +16,7 @@ import de.ifgi.sitcom.campusmapper.views.ImageView;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -99,7 +100,12 @@ public class IndoorConnectionActivity extends SherlockFragmentActivity implement
 	    		  mFloorPlan.setFloorNumber(intent
 										.getIntExtra(ChooseLocationActivity.EXTRA_FLOOR_NUMBER, 0));
 
-	    			new LoadPlanFromLODUM().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+	    			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	    				new LoadPlanFromLODUM()
+	    						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+	    			} else {
+	    				new LoadPlanFromLODUM().execute();
+	    			}
 	    	  }else {
 	  	  		choosePlanDialogFragment = new ChoosePlanDialog();
 				choosePlanDialogFragment.attachHandler(this);
@@ -194,7 +200,12 @@ public class IndoorConnectionActivity extends SherlockFragmentActivity implement
 	     * For this reason use .executeOnExecutor instead of .execute. This way we can have multiple async tasks at the same time.
 	     */
 		mFloorPlan = dialog.getSelectedPlan();
-		new LoadPlanFromLODUM().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new LoadPlanFromLODUM()
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		} else {
+			new LoadPlanFromLODUM().execute();
+		}
 
 	}
 

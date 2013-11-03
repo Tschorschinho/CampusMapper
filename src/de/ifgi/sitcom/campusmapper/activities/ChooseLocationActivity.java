@@ -358,6 +358,7 @@ public class ChooseLocationActivity extends SherlockFragmentActivity  implements
 						ChooseLocationActivity.this,
 						getString(R.string.message_no_server_response),
 						Toast.LENGTH_SHORT).show();
+				mProgressDialog.dismiss();
 				return;
 			}
 

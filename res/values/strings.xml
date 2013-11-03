@@ -69,5 +69,6 @@
     <string name="title_settings">Einstellungen</string>
     <string name="label_settings_scale_factor_image">Verkleinerungsfaktor für Fluchtplanbild</string>
     <string name="description_settings_scale_factor_image">Treten Probleme beim Laden von Bildern auf, sollte dieser Wert auf 2 oder 3 erhöht werden.</string>
+    <string name="label_uri">URI</string>
 
 </resources>

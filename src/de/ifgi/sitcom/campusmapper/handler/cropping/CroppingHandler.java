@@ -46,6 +46,9 @@ public class CroppingHandler extends UIActionHandler {
 	private static final int MODE_RESULT = 2;
 	private static final int MODE_RESET = 3;
 	private int mMode = MODE_SELECT;
+	
+	private int mImageWidth;
+	private int mImageHeight;
 
 	@Override
 	public void init(ImageViewBase imageViewBase) {
@@ -70,6 +73,10 @@ public class CroppingHandler extends UIActionHandler {
 		mCircleCY = imageViewBase.getImageHeight() - borderDist;
 		mCircleDX = imageViewBase.getImageWidth() - borderDist;
 		mCircleDY = imageViewBase.getImageHeight() - borderDist;
+		
+		// init image width and height
+		mImageWidth = imageViewBase.getImageWidth();
+		mImageHeight = imageViewBase.getImageHeight();
 	}
 
 	@Override
@@ -186,6 +193,10 @@ public class CroppingHandler extends UIActionHandler {
 
 			final float x = ev.getX(pointerIndex)/ scaleFactor - xPos;
 			final float y = ev.getY(pointerIndex)/ scaleFactor - yPos;
+			
+			// check if new position is on the image, if not break
+			if(x >= mImageWidth || y >= mImageHeight) return true;
+			if(x < 0 || y < 0) return true;
 
 			// move selected mask corner
 			switch (mSelectedCorner) {

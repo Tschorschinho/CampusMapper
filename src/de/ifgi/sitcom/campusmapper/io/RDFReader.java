@@ -95,9 +95,10 @@ public class RDFReader {
    	 String queryString = "SELECT DISTINCT ?floor ?escapePlan ?source ?cropped ?id WHERE {"
  			+ "?floor a <http://vocab.lodum.de/limap/floor> ."
  				+ "?floor <http://vocab.lodum.de/limap/hasEscapePlan> ?escapePlan ."
- 				+ "?escapePlan <http://vocab.lodum.de/limap/hasSourceImage> ?source ."
+ 				+ "OPTIONAL{ ?escapePlan <http://vocab.lodum.de/limap/hasSourceImage> ?source ."
  				+ "?escapePlan <http://vocab.lodum.de/limap/hasCroppedImage> ?cropped ."
  				+ "?escapePlan <http://vocab.lodum.de/limap/id> ?id ."
+       			+ "}"
  				+ "}";
     	  
 		QueryExecution queryExecution = null;
@@ -119,15 +120,19 @@ public class RDFReader {
 
      		String floorURI = solution.getResource("floor").getURI();
      		String escapePlan = solution.getResource("escapePlan").getURI();
-     		String source = solution.getLiteral("source").getLexicalForm();
-     		String cropped = solution.getLiteral("cropped").getLexicalForm();
-     		String id = solution.getLiteral("id").getLexicalForm();
-     				
+
      		floorPlan.setFloorURI(floorURI);
      		floorPlan.setEscapePlanURI(escapePlan);
-     		floorPlan.setSourceFloorPlanImageUri(Uri.parse(source));
-     		floorPlan.setCroppedFloorPlanImageUri(Uri.parse(cropped));
-     		floorPlan.setId(id);
+     		
+     		if(solution.getLiteral("source") != null){
+         		String source = solution.getLiteral("source").getLexicalForm();
+         		String cropped = solution.getLiteral("cropped").getLexicalForm();
+         		String id = solution.getLiteral("id").getLexicalForm();
+         		floorPlan.setSourceFloorPlanImageUri(Uri.parse(source));
+         		floorPlan.setCroppedFloorPlanImageUri(Uri.parse(cropped));
+         		floorPlan.setId(id);     			
+     		}
+
      	
      		return floorPlan;
      	}
@@ -311,7 +316,9 @@ public class RDFReader {
         			String roomName = getRoomName(roomURI, model);
         			
         			// get persons and add new room
-        			rooms.add(new Room(geometries.get(0), roomName, getPersons(roomURI, model)));
+        			Room newRoom = new Room(geometries.get(0), roomName, getPersons(roomURI, model));
+        			newRoom.setUri(roomURI);
+        			rooms.add(newRoom);
         			
         		} else {
         			// should be a corridor than
@@ -320,7 +327,9 @@ public class RDFReader {
         				lines.add((Line) g);
         			}
         			MultiLine ml = new MultiLine(lines);
-        			corridors.add(new Corridor(ml));
+        			Corridor newCorridor = new Corridor(ml);
+        			newCorridor.setUri(roomURI);
+        			corridors.add(newCorridor);
         		}
         		
         		
@@ -580,6 +589,9 @@ public class RDFReader {
         			}
         		}
         		
+        		
+        		Elevator newElevator = new Elevator(geometryA, destinations);
+        		newElevator.setUri(elevatorURI);
         		elevators.add(new Elevator(geometryA, destinations));
         	}
         }
@@ -628,7 +640,9 @@ public class RDFReader {
         			}
         		}
         		
-        		stairs.add(new Stairs(geometryA, destinations));
+        		Stairs newStairs = new Stairs(geometryA, destinations);
+        		newStairs.setUri(stairsURI);
+        		stairs.add(newStairs);
         	}
         }
         if(queryExecution != null ) queryExecution.close();
@@ -679,13 +693,17 @@ public class RDFReader {
         		}
         		
         		if(geometryB != null){
-            		entrances.add(new EntranceIndoor(geometryA, geometryB, floorPlanB));        			
+        			Entrance newEntrance = new EntranceIndoor(geometryA, geometryB, floorPlanB);
+            		newEntrance.setUri(entranceURI);
+        			entrances.add(newEntrance);        			
         		} else {
 
                 	// get global coordinates
         			GeoPoint globalCoordinates = getGlobalCoordinates(entranceURI, model);
         			if (globalCoordinates != null){
-                		entrances.add(new EntranceOutdoor(geometryA, globalCoordinates));
+            			Entrance newEntrance = new EntranceOutdoor(geometryA, globalCoordinates);
+                		newEntrance.setUri(entranceURI);
+                		entrances.add(newEntrance);
         			}
         			
         		}        	
@@ -725,7 +743,9 @@ public class RDFReader {
 				String doorURI = solution.getResource("door").getURI();
 				ArrayList<Geometry> geometries = getLocalCoordinates(doorURI, model);
 				Line l = (Line) geometries.get(0);
-				doors.add(new Door(l));
+				Door newDoor = new Door(l);
+				newDoor.setUri(doorURI);
+				doors.add(newDoor);
 
 			}
 		}
@@ -749,8 +769,8 @@ public class RDFReader {
 
         // Query uses an external SPARQL endpoint for processing
         QueryEngineHTTP qe = new QueryEngineHTTP(SPARQL_ENDPOINT_URI, query);
-        String pw = "test";
-        qe.setBasicAuthentication("test", pw.toCharArray());
+        String pw = "pw";
+        qe.setBasicAuthentication("user", pw.toCharArray());
         ResultSet rs = null;
 
         try {
@@ -771,17 +791,6 @@ public class RDFReader {
 	}
 	
 	private ResultSet localQuery(String queryString, QueryExecution queryExecution){
-
-        // Important - free up resources used running the query
-//		if (mLocalQueryExecution != null) mLocalQueryExecution.close();
-		
-		
-//    	// Create a Query instance
-//        Query query = QueryFactory.create(queryString);
-//        Log.v("local query", query.toString());
-
-        // Query uses an external SPARQL endpoint for processing
-//        queryExecution = QueryExecutionFactory.create(query, model);
         
         ResultSet rs = null;
 

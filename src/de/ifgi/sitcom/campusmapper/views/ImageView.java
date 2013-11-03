@@ -25,7 +25,6 @@ import de.ifgi.sitcom.campusmapper.handler.UIActionHandler;
 public class ImageView extends ImageViewBase {
 
 	private Bitmap mImageBitmap;
-//	private Mat mImage = null; // the image to be shown
 	private Uri mImageUri;
 	private int mInSampleSize = 1;
 
@@ -50,14 +49,6 @@ public class ImageView extends ImageViewBase {
 		this.mImageUri = imageUri;
 	}
 
-//	public Mat getImage() {
-//		return this.mImage;
-//	}
-//
-//	public void setImage(Mat im) {
-//		this.mImage = im;
-//	}
-	
 	public int getmImSampleSize() {
 		return mInSampleSize;
 	}
@@ -85,12 +76,6 @@ public class ImageView extends ImageViewBase {
 			mImageBitmap.recycle();
 			mImageBitmap = null;
 		}
-
-//		// Explicitly deallocate Mats
-//		if (mImage != null)
-//			mImage.release();
-//		mImage = null;
-		
 		System.gc();
 
 	}
@@ -106,56 +91,16 @@ public class ImageView extends ImageViewBase {
 			loadImageFromServer();
 			mAction = ACTION_NONE;
 		}
-
-//		if (mImage == null){
-//			return null;			
-//		}
-
-
-//		if (mImageBitmap == null
-//				|| mImage.width() != mImageBitmap.getWidth()
-//				|| mImage.height() != mImageBitmap.getHeight()) {
-//
-//			Log.v("debug", "Bitmap doesnt fit Mat -> create new Bitmap");
-//			createNewBitmap();
-//
-//			return null;
-//		}
 		Bitmap bmp = mImageBitmap;
-//		try {
-//			Utils.matToBitmap(mImage, bmp);
-//		} catch (Exception e) {
-//			Log.e("de.ifgi.sitcom.campusmapper",
-//					"Utils.matToBitmap() throws an exception: "
-//							+ e.getMessage());
-//			bmp.recycle();
-//			bmp = null;
-//		}
+
 		return bmp;
 
 	}
 
-//	private void createNewBitmap() {
-//
-//		if (mImageBitmap != null) {
-//			mImageBitmap.recycle();
-//			mImageBitmap = null;
-//		}
-//
-//		try {
-//			mImageBitmap = Bitmap.createBitmap(mImage.width(), mImage.height(),
-//					Bitmap.Config.ARGB_8888);
-//		} catch (OutOfMemoryError e) {
-//			e.printStackTrace();
-//		}
-//		
-//		initImage(mImage.width(), mImage.height());
-//	}
-
+	
 	private void loadImageFromServer() {
 
 		recycle();
-//		mImage = new Mat();
 		
 		   try {
 
@@ -176,10 +121,6 @@ public class ImageView extends ImageViewBase {
 		        e.printStackTrace();
 		    }
 		
-
-//		Utils.bitmapToMat(mImageBitmap, mImage);
-//		Imgproc.cvtColor(mImage, mImage, Imgproc.COLOR_RGBA2RGB, 3);
-		
 		initImage(mImageBitmap.getWidth(), mImageBitmap.getHeight());
 	}
 	
@@ -187,12 +128,8 @@ public class ImageView extends ImageViewBase {
 	private void loadImage() {
 
 		recycle();
-//		mImage = new Mat();
-		
-		mImageBitmap = readBitmapScaled(mImageUri);
-//		Utils.bitmapToMat(mImageBitmap, mImage);
-//		Imgproc.cvtColor(mImage, mImage, Imgproc.COLOR_RGBA2RGB, 3);
-		
+
+		mImageBitmap = readBitmapScaled(mImageUri);		
 
 		initImage(mImageBitmap.getWidth(), mImageBitmap.getHeight());
 	}

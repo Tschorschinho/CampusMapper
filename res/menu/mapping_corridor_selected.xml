@@ -6,6 +6,11 @@
         android:showAsAction="always"
         android:title="Delete"/>
         <item
+        android:id="@+id/action_info"
+        android:icon="@drawable/ic_menu_info"
+        android:showAsAction="always"
+        android:title="Info"/>
+        <item
         android:id="@+id/action_cancel"
         android:icon="@drawable/ic_action_cancel"
         android:showAsAction="always"

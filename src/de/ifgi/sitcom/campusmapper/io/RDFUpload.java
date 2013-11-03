@@ -46,7 +46,7 @@ public class RDFUpload {
 			URL url = new URL(UPLOAD_SERVER_URI);
 			URLConnection conn = url.openConnection();
 			
-			String userpass = "test:test"; // username:password
+			String userpass = "username:password"; // username:password
 					String basicAuth = "Basic " + new String(Base64.encode(userpass.getBytes()));
 					conn.setRequestProperty ("Authorization", basicAuth);
 

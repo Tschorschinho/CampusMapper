@@ -12,6 +12,7 @@ import de.ifgi.sitcom.campusmapper.R;
 import de.ifgi.sitcom.campusmapper.activities.MappingActivity;
 import de.ifgi.sitcom.campusmapper.dialogs.EntranceDialog;
 import de.ifgi.sitcom.campusmapper.dialogs.EntranceDialog.EntranceDialogListener;
+import de.ifgi.sitcom.campusmapper.dialogs.ObjectInfoDialog;
 import de.ifgi.sitcom.campusmapper.dialogs.RoomDialog;
 import de.ifgi.sitcom.campusmapper.dialogs.RoomDialog.RoomDialogListener;
 import de.ifgi.sitcom.campusmapper.dialogs.StairsDialog;
@@ -192,7 +193,9 @@ public class EditHandler extends UIActionHandler implements RoomDialogListener, 
 
 		case R.id.action_delete:
 
-			mFloorPlan.delete(mSelectedObject);
+			if (mSelectedObject != null){
+				mFloorPlan.delete(mSelectedObject);
+			}
 			mActivity.triggerEditMode();
 
 			return;
@@ -204,29 +207,43 @@ public class EditHandler extends UIActionHandler implements RoomDialogListener, 
 			return;
 			
 		case R.id.action_edit_room:
-			RoomDialog roomDialogFragment = new RoomDialog();
-			roomDialogFragment.attachHandler(this);
-			roomDialogFragment.showCreateDoorCheckBox(false);
-			roomDialogFragment.setRoom((Room) mSelectedObject);
-			roomDialogFragment.setPersonNames(mFloorPlan.getPersonNames());
-			roomDialogFragment.show(mActivity.getSupportFragmentManager(), "Edit Room");			
+			if (mSelectedObject != null){
+				RoomDialog roomDialogFragment = new RoomDialog();
+				roomDialogFragment.attachHandler(this);
+				roomDialogFragment.showCreateDoorCheckBox(false);
+				roomDialogFragment.setRoom((Room) mSelectedObject);
+				roomDialogFragment.setPersonNames(mFloorPlan.getPersonNames());
+				roomDialogFragment.show(mActivity.getSupportFragmentManager(), "Edit Room");			
+			}
 			return;
 			
 		case R.id.action_edit_stairs:
-			StairsDialog stairsDialogFragment = new StairsDialog();
-			stairsDialogFragment.attachHandler(this);
-			stairsDialogFragment.setBuildingURI(mFloorPlan.getBuildingURI());
-			stairsDialogFragment.setBasicFloorNumber(mFloorPlan.getFloorNumber());
-			stairsDialogFragment.setVerticalConnection((VerticalConnection) mSelectedObject);
-			stairsDialogFragment.show(mActivity.getSupportFragmentManager(), "Edit Stairs");
+			if (mSelectedObject != null){
+				StairsDialog stairsDialogFragment = new StairsDialog();
+				stairsDialogFragment.attachHandler(this);
+				stairsDialogFragment.setBuildingURI(mFloorPlan.getBuildingURI());
+				stairsDialogFragment.setBasicFloorNumber(mFloorPlan.getFloorNumber());
+				stairsDialogFragment.setVerticalConnection((VerticalConnection) mSelectedObject);
+				stairsDialogFragment.show(mActivity.getSupportFragmentManager(), "Edit Stairs");
+			}
 			return;
 			
 		case R.id.action_edit_entrance:
-			EntranceDialog entranceDialogFragment = new EntranceDialog();
-			entranceDialogFragment.attachHandler(this);
-			entranceDialogFragment.setBasicFloorPlan(mFloorPlan);
-			entranceDialogFragment.setEntrance((Entrance) mSelectedObject);		
-			entranceDialogFragment.show(mActivity.getSupportFragmentManager(), "Edit Entrance");
+			if (mSelectedObject != null){
+				EntranceDialog entranceDialogFragment = new EntranceDialog();
+				entranceDialogFragment.attachHandler(this);
+				entranceDialogFragment.setBasicFloorPlan(mFloorPlan);
+				entranceDialogFragment.setEntrance((Entrance) mSelectedObject);		
+				entranceDialogFragment.show(mActivity.getSupportFragmentManager(), "Edit Entrance");
+			}
+			return;
+		case R.id.action_info:
+			// show dialog with the object's uri
+			if (mSelectedObject != null){
+				ObjectInfoDialog objectInfoDialog = new ObjectInfoDialog();
+				objectInfoDialog.setObjectURI(mSelectedObject.getUri());
+				objectInfoDialog.show(mActivity.getSupportFragmentManager(), "");
+			}
 			return;
 		}
 		
